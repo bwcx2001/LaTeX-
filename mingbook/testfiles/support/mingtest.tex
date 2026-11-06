@@ -1,0 +1,27 @@
+% MingBook 回归测试的公共定义，在 \documentclass 之后 \input{mingtest}。
+%
+% 测试正文放在 \setbox0=\vbox{...} 里排版，字体加载等与环境有关的日志
+% 发生在 \START 之前，不进入比对；要比对的结果用下面的命令记录，
+% \START 之后用 \RESULTS 统一输出。
+%   \REC{...}      记录展开后的内容（保留受保护的命令名）
+%   \RECTEXT{...}  只记录纯文字（去掉 \kern、\, 等排版命令），用于名称、标签
+%   \RECREF{标签}  记录 \ref 得到的编号
+%   \RECCREF{标签} 记录 cleveref 的类型和编号，例如 [theorem][1][1]1.1
+\makeatletter
+\def\RESULTS{}
+\def\ming@addresult#1{%
+  \expandafter\g@addto@macro\expandafter\RESULTS\expandafter{\expandafter\TYPE\expandafter{#1}}}
+\def\REC#1{\protected@edef\x{#1}\ming@addresult\x}
+\ExplSyntaxOn
+\cs_set:Npn \RECTEXT #1
+  { \protected@edef \x { \text_purify:n {#1} } \ming@addresult \x }
+\ExplSyntaxOff
+\def\ming@detokcar#1#2\@nil{\detokenize{#1}}
+\def\RECREF#1{\@ifundefined{r@#1}
+  {\REC{#1: undefined}}
+  {\edef\x{#1: \expandafter\expandafter\expandafter\ming@detokcar\csname r@#1\endcsname\@nil}%
+   \ming@addresult\x}}
+\def\RECCREF#1{\@ifundefined{r@#1@cref}
+  {\REC{#1 (cref): undefined}}
+  {\edef\x{#1 (cref): \expandafter\expandafter\expandafter\ming@detokcar\csname r@#1@cref\endcsname\@nil}%
+   \ming@addresult\x}}

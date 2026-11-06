@@ -1,0 +1,11 @@
+\input{regression-test}
+\documentclass[]{mingbook}
+\input{mingtest}
+\makeatletter
+\begin{document}
+\REC{empty by default: [\ming@footermark]}
+\mingfootermark{Signature}
+\REC{after setting: [\ming@footermark]}
+\START
+\RESULTS
+\END

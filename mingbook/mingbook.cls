@@ -9,7 +9,7 @@
 % 许可：LPPL 1.3c
 % -----------------------------------------------------------------------------
 \NeedsTeXFormat{LaTeX2e}[2022/06/01]
-\ProvidesClass{mingbook}[2026/11/06 v0.1 MingBook book class]
+\ProvidesClass{mingbook}[2026/11/06 v0.2.0 MingBook book class]
 
 \RequirePackage{iftex}
 \ifPDFTeX
@@ -59,7 +59,6 @@
       { \tl_gset_eq:NN \g__ming_thmnum_tl \l_keys_choice_tl },
     thmnum   .initial:n  = chapter,
     bibstyle .tl_gset:N  = \g__ming_bibstyle_tl,
-    bibstyle .initial:n  = numeric-comp,
     twoside  .bool_gset:N = \g__ming_twoside_bool,
     twoside  .default:n  = true,
     answer   .bool_gset:N = \g__ming_answer_bool,
@@ -81,7 +80,13 @@
 \cs_new:Npn \ming@ifshared #1#2 { \bool_if:NTF \g__ming_shared_bool {#1} {#2} }
 \cs_new:Npn \ming@ifzhchap #1#2 { \bool_if:NTF \g__ming_zhchap_bool {#1} {#2} }
 \cs_new:Npn \ming@thmwithin { \tl_use:N \g__ming_thmnum_tl }
-\cs_new:Npn \ming@bibstyle { \tl_use:N \g__ming_bibstyle_tl }
+% 参考文献样式：未指定时，中文用国标 gb7714-2015，英文用 numeric-comp
+\cs_new:Npn \ming@bibstyle
+  {
+    \tl_if_empty:NTF \g__ming_bibstyle_tl
+      { \str_if_eq:VnTF \g__ming_lang_tl { cn } { gb7714-2015 } { numeric-comp } }
+      { \tl_use:N \g__ming_bibstyle_tl }
+  }
 
 \bool_if:NTF \g__ming_twoside_bool
   { \PassOptionsToClass { twoside } { book } }
@@ -320,7 +325,12 @@
 % =============================================================================
 \RequirePackage{fancyhdr}
 \newcommand\ming@headfont{\normalfont\small\sffamily\color{ming-gray}}
+% 页脚左下角的标记（签名、版权声明等），默认为空：
+%   \mingfootermark{内容}
+\newcommand\ming@footermark{}
+\newcommand\mingfootermark[1]{\gdef\ming@footermark{#1}}
 \fancyhf{}
+\fancyfoot[L]{\ming@footermark}
 \ExplSyntaxOn
 \bool_if:NTF \g__ming_twoside_bool
   {
@@ -338,6 +348,7 @@
 \fancypagestyle{plain}{%
   \fancyhf{}%
   \fancyfoot[C]{\ming@headfont\thepage}%
+  \fancyfoot[L]{\ming@footermark}%
   \renewcommand\headrule{}}
 \pagestyle{fancy}
 % fancyhdr 会重设 \chaptermark，因此放在 \pagestyle{fancy} 之后
@@ -365,6 +376,40 @@
 
 \RequirePackage{caption}
 \captionsetup{font=small, labelfont={bf,color=ming-main}, labelsep=quad, skip=6pt}
+
+% =============================================================================
+% 8.5 超链接与智能引用
+%     \cref{标签} 自动带上“定理”“图”“式”等名称；cleveref 必须在 hyperref 之后
+% =============================================================================
+\RequirePackage{hyperref}
+\hypersetup{
+  colorlinks, linkcolor=ming-main, citecolor=ming-second, urlcolor=ming-third,
+  bookmarksnumbered, bookmarksopen, unicode, pdfstartview=FitH}
+\RequirePackage[noabbrev, nameinlink]{cleveref}
+% \ming@crefname{类型}{名称}：为一种引用类型设置名称。
+%   中文：单复数相同；英文：cleveref 已有的类型保持原样，新类型复数加 s
+\newcommand\ming@crefname[2]{%
+  \ming@ifcn
+    {\crefname{#1}{#2}{#2}\Crefname{#1}{#2}{#2}}
+    {\@ifundefined{cref@#1@name}
+       {\crefname{#1}{#2}{#2s}\Crefname{#1}{#2}{#2s}}{}}}
+\ming@ifcn{%
+  \crefname{figure}{图}{图}\Crefname{figure}{图}{图}
+  \crefname{table}{表}{表}\Crefname{table}{表}{表}
+  \crefname{equation}{式}{式}\Crefname{equation}{式}{式}
+  \crefformat{chapter}{#2第~#1~章#3}\Crefformat{chapter}{#2第~#1~章#3}
+  \crefformat{section}{#2第~#1~节#3}\Crefformat{section}{#2第~#1~节#3}
+  \crefformat{subsection}{#2第~#1~节#3}\Crefformat{subsection}{#2第~#1~节#3}
+  \crefname{appendix}{附录}{附录}\Crefname{appendix}{附录}{附录}
+  \crefname{enumi}{}{}\Crefname{enumi}{}{}
+  \newcommand\crefpairconjunction{和}
+  \newcommand\crefmiddleconjunction{、}
+  \newcommand\creflastconjunction{和}
+  \newcommand\crefrangeconjunction{至}
+  \newcommand\crefpairgroupconjunction{和}
+  \newcommand\crefmiddlegroupconjunction{、}
+  \newcommand\creflastgroupconjunction{和}
+}{}
 
 % =============================================================================
 % 9. 定理类环境（tcolorbox）
@@ -413,6 +458,22 @@
   },
 }
 
+% 让正文里的 \label 指向本盒子的编号，并让 \cref 认出环境类型。
+% tcolorbox 把编号写在标题里，标题在另一个盒子中排版，正文中的 \label
+% 看不到它；这里在正文开头重新设置引用信息（不再步进计数器、不新建锚点），
+% 写法与 cleveref 的 \refstepcounter 相同，只是类型换成环境名。
+\newcommand\ming@setlabel[2]{% #1 计数器  #2 环境名（cleveref 类型）
+  \protected@edef\@currentlabel{\csname p@#1\endcsname\csname the#1\endcsname}%
+  \@ifundefined{theH#1}%
+    {\edef\@currentHref{#1.\arabic{#1}}}%
+    {\edef\@currentHref{#1.\csname theH#1\endcsname}}%
+  \cref@constructprefix{#1}{\cref@result}%
+  \protected@edef\cref@currentlabel{%
+    [#2][\arabic{#1}][\cref@result]\csname p@#1\endcsname\csname the#1\endcsname}}
+\tcbset{
+  ming/label/.style={before upper pre={\ming@setlabel{\tcbcounter}{#1}}},
+}
+
 % 当前全局外观
 \ming@ifstyle{fancy}{\tcbset{ming/thm/.style={ming/fancy=#1}}}{%
 \ming@ifstyle{frame}{\tcbset{ming/thm/.style={ming/frame=#1}}}{%
@@ -428,16 +489,17 @@
   \def\ming@tmp{shared}%
   \ifx\ming@cnt\ming@tmp
     \DeclareTColorBox[use counter from=ming@counterholder]{#1}{ O{} }{%
-      #4={#3},
+      #4={#3}, ming/label={#1},
       title={#2~\thetcbcounter\ifblank{##1}{}{\ (##1)}}}%
   \else
     \DeclareTColorBox[auto counter, number within=\ming@thmwithin]{#1}{ O{} }{%
-      #4={#3},
+      #4={#3}, ming/label={#1},
       title={#2~\thetcbcounter\ifblank{##1}{}{\ (##1)}}}%
   \fi
   \DeclareTColorBox{#1*}{ O{} }{%
     #4={#3},
     title={#2\ifblank{##1}{}{\ (##1)}}}%
+  \ming@crefname{#1}{#2}%
 }
 \newcommand\ming@thmcnt{\ming@ifshared{shared}{own}}
 
@@ -491,6 +553,40 @@
   title={#1},
   borderline west={0.8pt}{0pt}{ming-second!70}, left=8pt,
   fontupper=\mingquotefont}
+
+% =============================================================================
+% 9.5 代码环境
+%   \begin{code}[listings 选项][盒子选项] ... \end{code}
+%   例：\begin{code}[language=Python, numbers=left][title=快速排序]
+%   行内代码：\lstinline|...|
+% =============================================================================
+\tcbuselibrary{listings}
+\lstdefinestyle{ming}{
+  basicstyle=\ttfamily\small,
+  keywordstyle=\color{ming-main}\bfseries,
+  commentstyle=\color{ming-gray},
+  stringstyle=\color{ming-second},
+  numberstyle=\tiny\color{ming-gray},
+  numbersep=8pt,
+  columns=fullflexible, keepspaces=true,
+  breaklines=true, breakatwhitespace=false,
+  showstringspaces=false, tabsize=4,
+  upquote=true,
+}
+\lstset{style=ming}
+\tcbset{
+  ming/code/.style={
+    enhanced, breakable, listing only,
+    colback=ming-gray!5, colframe=ming-gray!35,
+    coltitle=ming-main, colbacktitle=ming-gray!12,
+    fonttitle=\sffamily\bfseries\small,
+    boxrule=0.4pt, arc=1pt, titlerule=0pt,
+    left=6pt, right=6pt, top=3pt, bottom=3pt,
+    before skip=8pt plus 2pt, after skip=8pt plus 2pt,
+  },
+}
+\DeclareTCBListing{code}{ O{} O{} }{%
+  ming/code, listing options={style=ming,#1}, #2}
 
 % =============================================================================
 % 10. 书籍结构环境
@@ -548,6 +644,9 @@
   \fi}
 
 \renewcommand\maketitle{%
+  \begingroup
+  % 封面不建页面锚点，避免与正文第 1 页的锚点重名
+  \hypersetup{pageanchor=false}%
   \begin{titlepage}
   \thispagestyle{empty}%
   \begin{tikzpicture}[remember picture, overlay]
@@ -589,19 +688,15 @@
     \fi
   \end{tikzpicture}
   \end{titlepage}%
+  \endgroup
   \setcounter{page}{1}}
 \date{}
 
 % =============================================================================
-% 12. 参考文献与超链接（hyperref 最后加载）
+% 12. 参考文献
 % =============================================================================
 \RequirePackage[backend=biber, style=\ming@bibstyle]{biblatex}
 \RequirePackage{csquotes}
 \ming@ifcn{%
   \DefineBibliographyStrings{english}{bibliography={参考文献}, references={参考文献}}}{}
-\RequirePackage{hyperref}
-\hypersetup{
-  colorlinks, linkcolor=ming-main, citecolor=ming-second, urlcolor=ming-third,
-  bookmarksnumbered, bookmarksopen, unicode, pdfstartview=FitH}
-
 \endinput

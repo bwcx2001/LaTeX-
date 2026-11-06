@@ -4,7 +4,8 @@
 module       = "mingbook"
 sourcefiles  = {"*.cls"}
 installfiles = {"*.cls"}
-checkengines = {"xetex"}
+checkengines = {"xetex", "luatex"}
 stdengine    = "xetex"
-checkruns    = 1
 
+-- 交叉引用测试需要读取上一次写入的 .aux
+checkruns    = 2

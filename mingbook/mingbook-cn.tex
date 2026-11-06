@@ -11,6 +11,18 @@
 
 \addbibresource{reference.bib}
 
+% =========================================================
+% 左下角花体签名（页脚水印）
+% =========================================================
+\usepackage{calligra}
+\newcommand{\CheSignature}{%
+  {\scriptsize\color{black!45}%
+    \scalebox{1.7}{{\calligra Che}}%
+    \songti 数学车老师编辑-未经允许-禁止传播%
+  }%
+}
+\mingfootermark{\CheSignature}
+
 \begin{document}
 
 \maketitle
@@ -46,7 +58,7 @@ MingBook 是一个面向讲义、教材和学习笔记的书籍模板。它保�
 
 \section{类选项}
 
-所有选项都写在 \verb|\documentclass[...]{mingbook}| 里，采用 \texttt{键=值} 的形式，表~\ref{tab:options} 列出了全部选项。未识别的选项（例如 \texttt{11pt}）会原样传给标准 book 类。
+所有选项都写在 \verb|\documentclass[...]{mingbook}| 里，采用 \texttt{键=值} 的形式，\cref{tab:options} 列出了全部选项。未识别的选项（例如 \texttt{11pt}）会原样传给标准 book 类。
 
 \begin{table}[htbp]
   \centering
@@ -68,13 +80,13 @@ MingBook 是一个面向讲义、教材和学习笔记的书籍模板。它保�
     \texttt{thmnum}     & \texttt{chapter}, \texttt{section} & 定理按章或按节编号 \\
     \texttt{thmcounter} & \texttt{separate}, \texttt{shared} & 定理类是否共用编号 \\
     \texttt{chapnum}    & \texttt{arabic}, \texttt{chinese} & “第 1 章”或“第一章” \\
-    \texttt{bibstyle}   & \texttt{numeric-comp} 或任意 biblatex 样式 & 参考文献样式 \\
+    \texttt{bibstyle}   & 中文 \texttt{gb7714-2015}，英文 \texttt{numeric-comp} & 参考文献样式 \\
     \bottomrule
   \end{tabular}
 \end{table}
 
 \begin{remark}
-写中文书稿时，可以设置 \texttt{bibstyle=gb7714-2015}，得到符合国标的参考文献格式。它依赖 biblatex-gb7714-2015 宏包，\TeX{} Live 已经自带。
+中文文档默认使用国标 \texttt{gb7714-2015} 参考文献样式，它依赖 biblatex-gb7714-2015 宏包，\TeX{} Live 已经自带。也可以用 \texttt{bibstyle=} 换成任意 biblatex 样式，例如 \texttt{bibstyle=authoryear}。
 \end{remark}
 
 \section{封面信息}
@@ -98,7 +110,7 @@ MingBook 是一个面向讲义、教材和学习笔记的书籍模板。它保�
 \end{problemset}
 
 % ---------------------------------------------------------------------------
-\chapter{数学环境}
+\chapter{数学环境}\label{chap:math}
 
 \begin{introduction}
   \item 定理与定义
@@ -153,7 +165,7 @@ MingBook 是一个面向讲义、教材和学习笔记的书籍模板。它保�
 无理数在实数中稠密。
 \end{proposition*}
 
-定理~\ref{thm:ftc} 和定义~\ref{def:riemann} 都可以用 \verb|\ref| 交叉引用，公式~\eqref{eq:ftc} 也一样。
+交叉引用推荐用 \verb|\cref|，它会自动带上名称：\verb|\cref{thm:ftc}| 得到“\cref{thm:ftc}”，\verb|\cref{def:riemann}| 得到“\cref{def:riemann}”，公式写 \verb|\cref{eq:ftc}| 得到“\cref{eq:ftc}”，章节写 \verb|\cref{chap:math}| 得到“\cref{chap:math}”。多个标签可以一起引用，例如 \verb|\cref{thm:ftc,def:riemann}| 得到“\cref{thm:ftc,def:riemann}”。只要编号时仍可用 \verb|\ref|。
 
 \section{例题、练习与解答}
 
@@ -162,7 +174,7 @@ MingBook 是一个面向讲义、教材和学习笔记的书籍模板。它保�
 \end{example}
 
 \begin{solution}
-取原函数 $F(x)=x^3/3$，由定理~\ref{thm:ftc} 得 $\int_0^1 x^2\,\mathrm{d}x = F(1)-F(0) = \frac{1}{3}$。
+取原函数 $F(x)=x^3/3$，由\cref{thm:ftc} 得 $\int_0^1 x^2\,\mathrm{d}x = F(1)-F(0) = \frac{1}{3}$。
 \end{solution}
 
 \begin{exercise}[换元积分]
@@ -218,9 +230,39 @@ MingBook 是一个面向讲义、教材和学习笔记的书籍模板。它保�
 \renewcommand\problemsetname{思考题}
 \end{verbatim}
 
+\section{代码}
+
+代码使用 \texttt{code} 环境，第一个可选参数是 listings 的选项（语言、行号等），第二个是盒子的选项（例如标题）。行内代码用 \verb+\lstinline|...|+，例如 \lstinline|x = sorted(data)|。
+
+\begin{verbatim}
+\begin{code}[language=Python, numbers=left][title=快速排序]
+...
+\end{code}
+\end{verbatim}
+
+\begin{code}[language=Python, numbers=left][title=快速排序]
+def quicksort(xs):
+    """返回排好序的新列表"""
+    if len(xs) <= 1:
+        return xs
+    pivot, *rest = xs
+    left = [x for x in rest if x < pivot]   # 比基准小
+    right = [x for x in rest if x >= pivot]
+    return quicksort(left) + [pivot] + quicksort(right)
+\end{code}
+
+不需要标题时只写第一个可选参数：
+
+\begin{code}[language={[LaTeX]TeX}]
+\documentclass[lang=cn, theme=green]{mingbook}
+\begin{document}
+\chapter{引言}
+\end{document}
+\end{code}
+
 \section{图表}
 
-图表标题使用主题色加粗标签。表格推荐使用 booktabs，如表~\ref{tab:compare}。
+图表标题使用主题色加粗标签。表格推荐使用 booktabs，如\cref{tab:compare}。
 
 \begin{table}[htbp]
   \centering
@@ -242,7 +284,13 @@ MingBook 是一个面向讲义、教材和学习笔记的书籍模板。它保�
 
 \section{参考文献}
 
-参考文献使用 biblatex，在导言区 \verb|\addbibresource{reference.bib}|，正文用 \verb|\cite| 引用，例如 \cite{knuth1984,rudin1976}，最后用 \verb|\printbibliography| 输出。中文文献同样可用\cite{liu2013}，盒子样式参考了 tcolorbox 手册\cite{tcolorbox}。
+参考文献使用 biblatex，用法分三步：
+\begin{itemize}
+  \item 导言区用 \verb|\addbibresource{reference.bib}| 加载文献库；
+  \item 正文用 \verb|\cite| 引用，中文默认的国标样式会生成上标形式，例如 \TeX{} 的权威参考\cite{knuth1984}、数学分析教材\cite{rudin1976}；
+  \item 文末用 \verb|\printbibliography| 输出。
+\end{itemize}
+想要正文中的方括号形式时用 \verb|\parencite|，例如\parencite{liu2013}。盒子样式参考了 tcolorbox 手册\cite{tcolorbox}。
 
 \appendix
 \chapter{版本记录}

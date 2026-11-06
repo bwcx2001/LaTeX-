@@ -1,0 +1,8 @@
+\input{regression-test}
+\documentclass[lang=en]{mingbook}
+\input{mingtest}
+\makeatletter
+\begin{document}
+\START
+\TYPE{bbx=\blx@bbxfile, cbx=\blx@cbxfile}
+\END
