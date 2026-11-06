@@ -13,8 +13,16 @@
   \expandafter\g@addto@macro\expandafter\RESULTS\expandafter{\expandafter\TYPE\expandafter{#1}}}
 \def\REC#1{\protected@edef\x{#1}\ming@addresult\x}
 \ExplSyntaxOn
+% 不同版本的 \text_purify:n 对 \, 的处理不同（删除或换成空格），
+% 这里先把 \, 统一成空格，保证结果与 TeX Live 版本无关
 \cs_set:Npn \RECTEXT #1
-  { \protected@edef \x { \text_purify:n {#1} } \ming@addresult \x }
+  {
+    \group_begin:
+      \cs_set:Npn \, { ~ }
+      \protected@edef \x { \text_purify:n {#1} }
+      \ming@addresult \x
+    \group_end:
+  }
 \ExplSyntaxOff
 \def\ming@detokcar#1#2\@nil{\detokenize{#1}}
 \def\RECREF#1{\@ifundefined{r@#1}
