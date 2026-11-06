@@ -467,6 +467,10 @@
   \@ifundefined{theH#1}%
     {\edef\@currentHref{#1.\arabic{#1}}}%
     {\edef\@currentHref{#1.\csname theH#1\endcsname}}%
+  % 较新的 LaTeX/cleveref 按 \@currentcounter 和计数器别名确定类型，
+  % 旧版本读 \cref@currentlabel，两种都设置
+  \def\@currentcounter{#1}%
+  \crefalias{#1}{#2}%
   \cref@constructprefix{#1}{\cref@result}%
   \protected@edef\cref@currentlabel{%
     [#2][\arabic{#1}][\cref@result]\csname p@#1\endcsname\csname the#1\endcsname}}
