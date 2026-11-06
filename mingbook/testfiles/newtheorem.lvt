@@ -1,0 +1,21 @@
+\input{regression-test}
+\documentclass[]{mingbook}
+\makeatletter
+% 先在盒子里排版（字体加载等与环境有关的日志不进入比对），
+% 用 \REC 记录结果，\START 之后统一输出
+\def\RESULTS{}
+\def\REC#1{\protected@edef\x{#1}%
+  \expandafter\g@addto@macro\expandafter\RESULTS\expandafter{\expandafter\TYPE\expandafter{\x}}}
+\begin{document}
+\setbox0=\vbox{\hsize=10cm
+\NewTheorem{conjecture}{猜想}
+\NewTheorem{algo}{算法}[def]
+\chapter{A}
+\begin{conjecture}x\end{conjecture}
+\begin{algo}x\end{algo}
+\begin{algo}x\end{algo}
+\REC{\conjecturename=\thetcb@cnt@conjecture, \algoname=\thetcb@cnt@algo}
+}
+\START
+\RESULTS
+\END

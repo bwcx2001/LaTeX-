@@ -1,0 +1,38 @@
+name: mingbook
+
+on:
+  push:
+    branches: [main]
+    paths: ["mingbook/**", ".github/workflows/mingbook.yml"]
+  pull_request:
+    paths: ["mingbook/**", ".github/workflows/mingbook.yml"]
+  workflow_dispatch:
+
+jobs:
+  test-and-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run regression tests and build example PDF
+        uses: xu-cheng/texlive-action@v2
+        with:
+          scheme: full
+          run: |
+            cd mingbook
+            l3build check -H
+            latexmk -xelatex -interaction=nonstopmode -halt-on-error mingbook-cn.tex
+
+      - name: Upload example PDF
+        uses: actions/upload-artifact@v4
+        with:
+          name: mingbook-cn-pdf
+          path: mingbook/mingbook-cn.pdf
+
+      - name: Upload test logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mingbook-test-logs
+          path: mingbook/build/test/*.diff
+          if-no-files-found: ignore

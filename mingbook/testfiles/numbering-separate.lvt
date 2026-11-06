@@ -1,0 +1,27 @@
+\input{regression-test}
+\documentclass[]{mingbook}
+\makeatletter
+% 先在盒子里排版（字体加载等与环境有关的日志不进入比对），
+% 用 \REC 记录结果，\START 之后统一输出
+\def\RESULTS{}
+\def\REC#1{\protected@edef\x{#1}%
+  \expandafter\g@addto@macro\expandafter\RESULTS\expandafter{\expandafter\TYPE\expandafter{\x}}}
+\begin{document}
+\setbox0=\vbox{\hsize=10cm
+\chapter{A}
+\begin{theorem}x\end{theorem}
+\begin{theorem}x\end{theorem}
+\begin{lemma}x\end{lemma}
+\begin{definition}x\end{definition}
+\begin{example}x\end{example}
+\REC{theorem=\thetcb@cnt@theorem}
+\REC{lemma=\thetcb@cnt@lemma}
+\REC{definition=\thetcb@cnt@definition}
+\REC{example=\thetcb@cnt@example}
+\chapter{B}
+\begin{theorem}x\end{theorem}
+\REC{theorem after new chapter=\thetcb@cnt@theorem}
+}
+\START
+\RESULTS
+\END

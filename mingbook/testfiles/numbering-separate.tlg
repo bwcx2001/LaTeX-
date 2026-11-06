@@ -1,0 +1,7 @@
+This is a generated file for the l3build validation system.
+Don't change this file in any respect.
+theorem=1.2
+lemma=1.1
+definition=1.1
+example=1.1
+theorem after new chapter=2.1
