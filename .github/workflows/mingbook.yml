@@ -24,6 +24,9 @@ jobs:
             cd mingbook
             l3build check -H
             latexmk -xelatex -interaction=nonstopmode -halt-on-error mingbook-cn.tex
+            # 再用 LuaLaTeX 编译一遍，确认两种引擎都能用
+            mkdir -p /tmp/lua && cp mingbook.cls mingbook-cn.tex reference.bib /tmp/lua/
+            (cd /tmp/lua && latexmk -lualatex -interaction=nonstopmode -halt-on-error mingbook-cn.tex)
 
       - name: Upload example PDF
         uses: actions/upload-artifact@v4

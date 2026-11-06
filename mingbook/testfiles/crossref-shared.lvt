@@ -1,0 +1,23 @@
+\input{regression-test}
+\documentclass[thmcounter=shared]{mingbook}
+\input{mingtest}
+\makeatletter
+\begin{document}
+% 标签要随页面输出才会写进 .aux，所以这里正常排版并在 \START 前换页
+\chapter{A}\label{chap:a}
+\section{S1}\section{S2}\section{S3}\label{sec:3}
+\begin{theorem}\label{thm:a}x\end{theorem}
+\begin{theorem}[Named]\label{thm:b}x\end{theorem}
+\begin{definition}\label{def:a}x\end{definition}
+\begin{example}\label{ex:a}x\end{example}
+\begin{equation}\label{eq:a}x\end{equation}
+\RECREF{thm:a}\RECCREF{thm:a}
+\RECREF{thm:b}\RECCREF{thm:b}
+\RECREF{def:a}\RECCREF{def:a}
+\RECREF{ex:a}\RECCREF{ex:a}
+\RECREF{eq:a}\RECCREF{eq:a}
+\RECCREF{sec:3}\RECCREF{chap:a}
+\clearpage
+\START
+\RESULTS
+\END

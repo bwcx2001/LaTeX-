@@ -1,14 +1,10 @@
 \input{regression-test}
 \documentclass[chapnum=chinese]{mingbook}
+\input{mingtest}
 \makeatletter
-% 先在盒子里排版（字体加载等与环境有关的日志不进入比对），
-% 用 \REC 记录结果，\START 之后统一输出
-\def\RESULTS{}
-\def\REC#1{\protected@edef\x{#1}%
-  \expandafter\g@addto@macro\expandafter\RESULTS\expandafter{\expandafter\TYPE\expandafter{\x}}}
 \begin{document}
 \setbox0=\vbox{\hsize=10cm
-\setcounter{chapter}{11}\chapter{A}\REC{\mingchapterlabel}
+\setcounter{chapter}{11}\chapter{A}\RECTEXT{\mingchapterlabel}
 }
 \START
 \RESULTS

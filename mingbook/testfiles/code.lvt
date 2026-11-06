@@ -1,0 +1,19 @@
+\input{regression-test}
+\documentclass[]{mingbook}
+\input{mingtest}
+\makeatletter
+\begin{document}
+\setbox0=\vbox{\hsize=10cm
+\begin{code}[language=Python, numbers=left][title=示例]
+def f(x):
+    return x + 1  # 注释
+\end{code}
+\begin{code}
+plain
+\end{code}
+\lstinline|inline|
+\REC{code environments typeset}
+}
+\START
+\RESULTS
+\END
