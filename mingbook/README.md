@@ -30,7 +30,7 @@
 | thmnum | chapter, section |
 | thmcounter | separate, shared |
 | chapnum | arabic, chinese |
-| cover | band（上半部色块）, print（浅色线描，适合黑白打印） |
+| cover | band（上半部色块）, print（浅色线描，适合黑白打印；线描用 `\coverart{\mingcoverconic}` 等切换） |
 | bibstyle | 中文默认 gb7714-2015，英文默认 numeric-comp，可设为任意 biblatex 样式 |
 
 ## 环境

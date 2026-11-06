@@ -8,6 +8,7 @@
 
 ### 新增
 - 类选项 `cover=print`：浅色封面，只用细线和浅灰函数线描，没有大面积色块，适合黑白打印。默认 `cover=band` 与原来相同。
+- `\coverart{TikZ 代码}`：替换浅色封面上部的线描。预设 `\mingcovertrig`（三角函数，默认）和 `\mingcoverconic`（圆锥曲线），`\mingcovergrid` 画浅灰网格和坐标轴。
 
 ## [0.2.0] - 2026-11-06
 

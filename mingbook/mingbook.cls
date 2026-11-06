@@ -645,6 +645,44 @@
 \let\ming@extrainfo\@empty
 \let\ming@coverimage\@empty
 \let\ming@logo\@empty
+
+% 浅色封面（cover=print）上部的线描。绘图区以页面中线为原点，
+% 横向 -7 至 7、纵向 -2.2 至 2.3 个单位（A4 上一个单位约 11.5mm）
+\newcommand\coverart[1]{\gdef\ming@coverart{#1}}
+% 浅灰网格和坐标轴，供线描使用
+\newcommand\mingcovergrid{%
+  \draw[black!10, line width=0.3pt, step=0.5] (-7,-2) grid (7,2);
+  \draw[black!45, line width=0.5pt, -{Stealth[length=2.2mm]}] (-7.2,0) -- (7.3,0);
+  \draw[black!45, line width=0.5pt, -{Stealth[length=2.2mm]}] (0,-2.2) -- (0,2.3);}
+% 预设一：三角函数（单位圆、正弦、余弦）
+\newcommand\mingcovertrig{%
+  \mingcovergrid
+  \draw[black!35, line width=0.5pt] (0,0) circle (1);
+  \draw[black!35, line width=0.4pt] (0,0) -- (60:1) -- (0.5,0);
+  \draw[black!30, line width=0.6pt, dashed, domain=-7:7, samples=160, smooth]
+    plot (\x, {1.6*cos(\x r)});
+  \draw[ming-main, line width=0.9pt, domain=-7:7, samples=160, smooth]
+    plot (\x, {1.6*sin(\x r)});
+  \fill[ming-second] (pi/2,1.6) circle (0.07);}
+% 预设二：圆锥曲线（左抛物线、中椭圆及焦半径、右双曲线及渐近线）
+\newcommand\mingcoverconic{%
+  \mingcovergrid
+  % 椭圆 x^2/2.6^2 + y^2/1.6^2 = 1，焦点 (±2.05, 0)，P 为椭圆上一点
+  \draw[ming-main, line width=0.9pt] (0,0) ellipse [x radius=2.6, y radius=1.6];
+  \draw[black!40, line width=0.4pt] (-2.05,0) -- ({2.6*cos(60)},{1.6*sin(60)}) -- (2.05,0);
+  \fill[ming-second] ({2.6*cos(60)},{1.6*sin(60)}) circle (0.07);
+  \fill[ming-second] (-2.05,0) circle (0.06) (2.05,0) circle (0.06);
+  % 双曲线右支 x^2/3.5^2 - y^2/1.3^2 = 1 与渐近线
+  \draw[black!30, line width=0.6pt, dashed] (2.8,{2.8*1.3/3.5}) -- (5.8,{5.8*1.3/3.5});
+  \draw[black!30, line width=0.6pt, dashed] (2.8,{-2.8*1.3/3.5}) -- (5.8,{-5.8*1.3/3.5});
+  \draw[black!60, line width=0.9pt, domain=-2.15:2.15, samples=80, smooth]
+    plot ({3.5*sqrt(1+(\x)^2/1.69)}, \x);
+  % 抛物线 y^2 = -2.4(x+3.5)，开口向左，焦点 (-4.1, 0)，准线 x = -2.9
+  \draw[black!30, line width=0.5pt, dashed] (-2.9,-2) -- (-2.9,2);
+  \draw[black!60, line width=0.9pt, domain=-2.15:2.15, samples=80, smooth]
+    plot ({-3.5-(\x)^2/2.4}, \x);
+  \fill[ming-second] (-4.1,0) circle (0.06);}
+\let\ming@coverart\mingcovertrig
 \colorlet{ming-cover}{ming-main}
 
 \newcommand\ming@infoline[2]{%
@@ -700,20 +738,12 @@
     % 顶部双细线
     \draw[ming-main, line width=1.2pt] ($(L)+(0,-24mm)$) -- ($(R)+(0,-24mm)$);
     \draw[ming-main, line width=0.4pt] ($(L)+(0,-25.6mm)$) -- ($(R)+(0,-25.6mm)$);
-    % 上部：封面图，或默认的函数线描
+    % 上部：封面图，或线描（\coverart，默认三角函数）
     \ifx\ming@coverimage\@empty
       \begin{scope}[shift={($(current page.north)+(0,-0.22\paperheight)$)},
                     x=0.055\paperwidth, y=0.055\paperwidth]
-        \draw[black!10, line width=0.3pt, step=0.5] (-7,-2) grid (7,2);
-        \draw[black!45, line width=0.5pt, -{Stealth[length=2.2mm]}] (-7.2,0) -- (7.3,0);
-        \draw[black!45, line width=0.5pt, -{Stealth[length=2.2mm]}] (0,-2.2) -- (0,2.3);
-        \draw[black!35, line width=0.5pt] (0,0) circle (1);
-        \draw[black!35, line width=0.4pt] (0,0) -- (60:1) -- (0.5,0);
-        \draw[black!30, line width=0.6pt, dashed, domain=-7:7, samples=160, smooth]
-          plot (\x, {1.6*cos(\x r)});
-        \draw[ming-main, line width=0.9pt, domain=-7:7, samples=160, smooth]
-          plot (\x, {1.6*sin(\x r)});
-        \fill[ming-second] (pi/2,1.6) circle (0.07);
+        \clip (-7.6,-2.6) rectangle (7.6,2.6);
+        \ming@coverart
       \end{scope}
     \else
       \node[inner sep=0pt] at ($(current page.north)+(0,-0.22\paperheight)$)

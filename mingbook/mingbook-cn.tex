@@ -92,7 +92,7 @@ MingBook 是一个面向讲义、教材和学习笔记的书籍模板。它保�
 
 \section{封面信息}
 
-封面由 \verb|\maketitle| 生成。上半部分默认是主题色色块，用 \verb|\coverimage{文件名}| 可以换成图片。黑白打印时用类选项 \verb|cover=print|：封面只有细线和浅灰色的函数线描，没有大面积深色，\verb|\coverimage| 的图片放在上部居中、不再铺满。可用的信息命令有：
+封面由 \verb|\maketitle| 生成。上半部分默认是主题色色块，用 \verb|\coverimage{文件名}| 可以换成图片。黑白打印时用类选项 \verb|cover=print|：封面只有细线和浅灰色的函数线描，没有大面积深色，\verb|\coverimage| 的图片放在上部居中、不再铺满。上部线描默认是三角函数，用 \verb|\coverart{\mingcoverconic}| 换成圆锥曲线；也可以在 \verb|\coverart{...}| 里写自己的 TikZ 代码，绘图区横向 $-7$ 至 $7$、纵向 $-2.2$ 至 $2.3$ 个单位，\verb|\mingcovergrid| 画浅灰网格和坐标轴。可用的信息命令有：
 \begin{itemize}
   \item \verb|\title|、\verb|\subtitle|、\verb|\author|、\verb|\institute|、\verb|\date|、\verb|\version|；
   \item \verb|\extrainfo|：封面底部的一段说明；

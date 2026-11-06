@@ -1,0 +1,12 @@
+\input{regression-test}
+\documentclass[cover=print]{mingbook}
+\input{mingtest}
+\makeatletter
+\title{T}
+\coverart{\mingcoverconic}
+\begin{document}
+\setbox0=\vbox{\maketitle}
+\START
+\def\expected{\mingcoverconic}
+\TYPE{art=\ifx\ming@coverart\expected conic\else other\fi, page=\the\value{page}}
+\END
