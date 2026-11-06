@@ -1,0 +1,257 @@
+% 编译：latexmk -xelatex mingbook-cn.tex
+\documentclass[lang=cn, theme=blue, thmstyle=fancy, twoside]{mingbook}
+
+\title{MingBook：克制的 \LaTeX{} 书籍模板}
+\subtitle{使用说明与排版示例}
+\author{MingBook 项目}
+\institute{latex 模板合集}
+\date{2026 年 11 月}
+\version{0.1}
+\extrainfo{本模板的设计思路参考了 ElegantBook，代码为重新编写，按 LPPL 1.3c 发布。}
+
+\addbibresource{reference.bib}
+
+\begin{document}
+
+\maketitle
+
+\frontmatter
+\chapter{前言}
+
+MingBook 是一个面向讲义、教材和学习笔记的书籍模板。它保留了 ElegantBook 最受欢迎的几个想法：用一个类选项切换主题色，用 tcolorbox 排版定理类环境，并提供章首导读、章末习题这类书籍结构；同时把风格收敛得更克制，类文件只有六百行左右（含注释），只加载真正用到的宏包。
+
+本文档本身就是模板的示例，源码 \texttt{mingbook-cn.tex} 可以直接作为新书的起点。
+
+\tableofcontents
+
+\mainmatter
+
+% ---------------------------------------------------------------------------
+\chapter{快速上手}
+
+\begin{introduction}
+  \item 需要哪些文件
+  \item 如何编译
+  \item 类选项一览
+  \item 封面信息
+\end{introduction}
+
+\section{文件与编译}
+
+模板只有一个必需文件 \texttt{mingbook.cls}，把它和你的 \texttt{.tex} 放在同一目录即可。编译需要 XeLaTeX 或 LuaLaTeX，参考文献使用 biber，推荐直接用 latexmk：
+\begin{center}
+  \texttt{latexmk -xelatex mingbook-cn.tex}
+\end{center}
+测试环境为 \TeX{} Live 2023 及以后的版本。Overleaf 上把编译器切换为 XeLaTeX 即可使用。
+
+\section{类选项}
+
+所有选项都写在 \verb|\documentclass[...]{mingbook}| 里，采用 \texttt{键=值} 的形式，表~\ref{tab:options} 列出了全部选项。未识别的选项（例如 \texttt{11pt}）会原样传给标准 book 类。
+
+\begin{table}[htbp]
+  \centering
+  \caption{MingBook 类选项}
+  \label{tab:options}
+  \small
+  \begin{tabular}{lll}
+    \toprule
+    选项 & 可选值（首个为默认） & 作用 \\
+    \midrule
+    \texttt{lang}       & \texttt{cn}, \texttt{en} & 界面语言 \\
+    \texttt{theme}      & \texttt{blue}, \texttt{green}, \texttt{red}, \texttt{purple}, \texttt{gray} & 颜色主题 \\
+    \texttt{thmstyle}   & \texttt{fancy}, \texttt{frame}, \texttt{plain} & 定理盒子外观 \\
+    \texttt{latinfont}  & \texttt{termes}, \texttt{lm} & 西文与数学字体 \\
+    \texttt{cjkfont}    & \texttt{auto}, \texttt{fandol}, \texttt{noto}, \texttt{none} & 中文字体 \\
+    \texttt{layout}     & \texttt{a4}, \texttt{b5}, \texttt{pad} & 纸张与版心 \\
+    \texttt{twoside}    & \texttt{false}, \texttt{true} & 双面排版 \\
+    \texttt{answer}     & \texttt{true}, \texttt{false} & 是否显示 solution \\
+    \texttt{thmnum}     & \texttt{chapter}, \texttt{section} & 定理按章或按节编号 \\
+    \texttt{thmcounter} & \texttt{separate}, \texttt{shared} & 定理类是否共用编号 \\
+    \texttt{chapnum}    & \texttt{arabic}, \texttt{chinese} & “第 1 章”或“第一章” \\
+    \texttt{bibstyle}   & \texttt{numeric-comp} 或任意 biblatex 样式 & 参考文献样式 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\begin{remark}
+写中文书稿时，可以设置 \texttt{bibstyle=gb7714-2015}，得到符合国标的参考文献格式。它依赖 biblatex-gb7714-2015 宏包，\TeX{} Live 已经自带。
+\end{remark}
+
+\section{封面信息}
+
+封面由 \verb|\maketitle| 生成。上半部分默认是主题色色块，用 \verb|\coverimage{文件名}| 可以换成图片。可用的信息命令有：
+\begin{itemize}
+  \item \verb|\title|、\verb|\subtitle|、\verb|\author|、\verb|\institute|、\verb|\date|、\verb|\version|；
+  \item \verb|\extrainfo|：封面底部的一段说明；
+  \item \verb|\logo|：右下角的标志图片。
+\end{itemize}
+没有设置的项目不会出现在封面上。
+
+\begin{summary}
+  只需一个 \texttt{mingbook.cls}，用 XeLaTeX 编译；外观主要靠 \texttt{theme} 和 \texttt{thmstyle} 两个选项决定。
+\end{summary}
+
+\begin{problemset}
+  \item 把本文档的 \texttt{theme} 改成 \texttt{green}，重新编译并观察变化。
+  \item 分别使用 \texttt{thmstyle=frame} 和 \texttt{thmstyle=plain} 编译，比较三种定理外观。
+  \item 设置 \texttt{answer=false}，确认下一章中的解答全部被隐藏。
+\end{problemset}
+
+% ---------------------------------------------------------------------------
+\chapter{数学环境}
+
+\begin{introduction}
+  \item 定理与定义
+  \item 例题与练习
+  \item 证明与解答
+  \item 自定义定理环境
+\end{introduction}
+
+\section{定理类环境}
+
+定理类环境分为三族，颜色各不相同：
+\begin{itemize}
+  \item 定理族（结构色）：\texttt{theorem}、\texttt{lemma}、\texttt{corollary}、\texttt{proposition}；
+  \item 定义族（辅助色）：\texttt{definition}、\texttt{axiom}；
+  \item 例题族（强调色、外观更轻）：\texttt{example}、\texttt{exercise}。
+\end{itemize}
+每个环境都有不编号的星号版本。可选参数是标题，标签直接写在环境内部，用法与普通 \LaTeX{} 一致：
+\begin{verbatim}
+\begin{theorem}[微积分基本定理]\label{thm:ftc}
+  ...
+\end{theorem}
+\end{verbatim}
+
+\begin{definition}[Riemann 可积]\label{def:riemann}
+设 $f$ 是 $[a,b]$ 上的有界函数。若存在实数 $I$，使得对任意 $\varepsilon>0$，都存在 $\delta>0$，只要分割 $P$ 的细度 $\lVert P\rVert<\delta$，就有
+\[
+  \Bigl\lvert \sum_{i=1}^{n} f(\xi_i)\,\Delta x_i - I \Bigr\rvert < \varepsilon ,
+\]
+则称 $f$ 在 $[a,b]$ 上 Riemann 可积，记 $I=\int_a^b f(x)\,\mathrm{d}x$。
+\end{definition}
+
+\begin{theorem}[微积分基本定理]\label{thm:ftc}
+若 $f$ 在 $[a,b]$ 上连续，$F$ 是 $f$ 的一个原函数，则
+\begin{equation}\label{eq:ftc}
+  \int_a^b f(x)\,\mathrm{d}x = F(b)-F(a).
+\end{equation}
+\end{theorem}
+
+\begin{proof}
+令 $G(x)=\int_a^x f(t)\,\mathrm{d}t$。由 $f$ 的连续性可知 $G'(x)=f(x)$，因此 $G-F$ 在 $[a,b]$ 上为常数。再由 $G(a)=0$ 得 $G(b)=F(b)-F(a)$。
+\end{proof}
+
+\begin{corollary}
+若 $f$ 在 $[a,b]$ 上连续且 $f\ge 0$，则 $\int_a^b f(x)\,\mathrm{d}x \ge 0$。
+\end{corollary}
+
+\begin{lemma}[Cauchy--Schwarz 不等式]
+对任意 $x,y\in\mathbb{R}^n$，有 $\lvert\langle x,y\rangle\rvert \le \lVert x\rVert\,\lVert y\rVert$。
+\end{lemma}
+
+\begin{proposition*}
+无理数在实数中稠密。
+\end{proposition*}
+
+定理~\ref{thm:ftc} 和定义~\ref{def:riemann} 都可以用 \verb|\ref| 交叉引用，公式~\eqref{eq:ftc} 也一样。
+
+\section{例题、练习与解答}
+
+\begin{example}
+计算 $\displaystyle\int_0^1 x^2\,\mathrm{d}x$。
+\end{example}
+
+\begin{solution}
+取原函数 $F(x)=x^3/3$，由定理~\ref{thm:ftc} 得 $\int_0^1 x^2\,\mathrm{d}x = F(1)-F(0) = \frac{1}{3}$。
+\end{solution}
+
+\begin{exercise}[换元积分]
+证明 $\displaystyle\int_0^{\pi/2}\sin^n x\,\mathrm{d}x=\int_0^{\pi/2}\cos^n x\,\mathrm{d}x$。
+\end{exercise}
+
+\begin{solution}
+令 $x=\frac{\pi}{2}-t$ 即可。
+\end{solution}
+
+\begin{remark}
+\texttt{solution} 环境受 \texttt{answer} 选项控制。设为 \texttt{answer=false} 时，所有解答都不会出现在 PDF 中，方便同时生成教师版和学生版。
+\end{remark}
+
+\begin{note}
+笔记环境用于写一些提示或个人体会，正文使用楷体（若没有楷体则用斜体）。
+\end{note}
+
+\section{自定义定理环境}
+
+用 \verb|\NewTheorem{环境名}{显示名}[族]| 可以新建环境，族取 \texttt{thm}（默认）、\texttt{def} 或 \texttt{ex}。例如：
+\begin{verbatim}
+\NewTheorem{conjecture}{猜想}
+\NewTheorem{algorithm}{算法}[def]
+\end{verbatim}
+
+\NewTheorem{conjecture}{猜想}
+\begin{conjecture}[Goldbach]
+每个大于 $2$ 的偶数都可以写成两个素数之和。
+\end{conjecture}
+
+\begin{problemset}
+  \item 证明：若 $f$ 在 $[a,b]$ 上单调，则 $f$ 在 $[a,b]$ 上 Riemann 可积。
+  \item 计算 $\displaystyle\lim_{n\to\infty}\sum_{k=1}^{n}\frac{1}{n+k}$。
+  \item 设 $f\in C[0,1]$，证明 $\displaystyle\lim_{n\to\infty}\int_0^1 x^n f(x)\,\mathrm{d}x=0$。
+\end{problemset}
+
+% ---------------------------------------------------------------------------
+\chapter{定制模板}
+
+\section{修改颜色}
+
+模板使用三种颜色：\texttt{ming-main}（标题、页眉、定理）、\texttt{ming-second}（例题、练习、注）和 \texttt{ming-third}（定义、公理）。在导言区重新定义即可覆盖主题：
+\begin{verbatim}
+\definecolor{ming-main}{HTML}{0B5563}
+\colorlet{ming-cover}{black}   % 只改封面色块
+\end{verbatim}
+
+\section{修改名称}
+
+所有固定文字都是宏，例如 \verb|\theoremname|、\verb|\problemsetname|、\verb|\introductionname|。想把“习题”改成“思考题”，只需
+\begin{verbatim}
+\renewcommand\problemsetname{思考题}
+\end{verbatim}
+
+\section{图表}
+
+图表标题使用主题色加粗标签。表格推荐使用 booktabs，如表~\ref{tab:compare}。
+
+\begin{table}[htbp]
+  \centering
+  \caption{MingBook 与 ElegantBook 的主要差异}
+  \label{tab:compare}
+  \small
+  \begin{tabular}{lll}
+    \toprule
+    方面 & ElegantBook & MingBook \\
+    \midrule
+    选项处理 & kvoptions & l3keys \\
+    定理写法 & \verb|{标题}{标签}| 两个必选参数 & \verb|[标题]| + \verb|\label| \\
+    盒子外观 & 一种（带花色符号） & fancy / frame / plain 三种 \\
+    编译引擎 & pdfLaTeX / XeLaTeX & XeLaTeX / LuaLaTeX \\
+    习题标题进页眉 & 否 & 是 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\section{参考文献}
+
+参考文献使用 biblatex，在导言区 \verb|\addbibresource{reference.bib}|，正文用 \verb|\cite| 引用，例如 \cite{knuth1984,rudin1976}，最后用 \verb|\printbibliography| 输出。中文文献同样可用\cite{liu2013}，盒子样式参考了 tcolorbox 手册\cite{tcolorbox}。
+
+\appendix
+\chapter{版本记录}
+
+\begin{itemize}
+  \item v0.1（2026-11-06）：第一个版本。
+\end{itemize}
+
+\backmatter
+\printbibliography[heading=bibintoc]
+
+\end{document}
