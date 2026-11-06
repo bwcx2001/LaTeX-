@@ -1,0 +1,10 @@
+\input{regression-test}
+\documentclass{mingbook}
+\input{mingtest}
+\makeatletter
+\title{T}
+\begin{document}
+\setbox0=\vbox{\maketitle}
+\START
+\TYPE{cover=\ming@ifprintcover{print}{band}, page=\the\value{page}}
+\END
