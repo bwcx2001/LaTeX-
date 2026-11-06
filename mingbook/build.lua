@@ -8,6 +8,3 @@ checkengines = {"xetex"}
 stdengine    = "xetex"
 checkruns    = 1
 
--- CI 的 TeX Live 镜像基于 Alpine，自带的 BusyBox diff 不支持 l3build 默认的
--- "diff -c --strip-trailing-cr"，这里改用两边都支持的统一格式
-diffexe      = "diff -u"

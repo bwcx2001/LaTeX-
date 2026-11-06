@@ -19,6 +19,8 @@ jobs:
         with:
           scheme: full
           run: |
+            # 镜像基于 Alpine，BusyBox 的 diff 不支持 l3build 需要的 -c，换成 GNU diffutils
+            apk add --no-cache diffutils
             cd mingbook
             l3build check -H
             latexmk -xelatex -interaction=nonstopmode -halt-on-error mingbook-cn.tex
